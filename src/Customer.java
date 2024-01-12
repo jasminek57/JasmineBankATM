@@ -1,5 +1,14 @@
 public class Customer {
+    private int pin;
+    private String name;
 
+    public Customer(int pin, String name){
+        this.pin = pin;
+        this.name = name;
+    }
+     public void setPin(int newPin){
+        pin = newPin;
+     }
     //used to set pin
     /*
     -get pin

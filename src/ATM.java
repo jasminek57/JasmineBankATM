@@ -1,3 +1,4 @@
 public class ATM {
-    //math stuff goes on here
+    // sll stm functions will be here
+    public ATM() {}
 }
