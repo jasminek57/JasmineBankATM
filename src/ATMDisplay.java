@@ -11,42 +11,44 @@ public class ATMDisplay {
             System.out.println("----------------------------------------");
             System.out.println("          Welcome to the ATM            ");
             System.out.println();
-            System.out.println("Please enter your name:                 ");
+            System.out.print("Please enter your name: ");
             String name = scan.nextLine();
-            System.out.println("Please create a pin:                    ");
+            System.out.print("Please create a pin: ");
             int pin = scan.nextInt();
             user = new Customer(pin, name);
             Account savings = new Account();
             Account checkings = new Account();
             atm = new ATM();
-            System.out.println("Congratulations, you are now a customer!");
             System.out.println();
+            System.out.println("Congratulations, you are now a customer!");
             System.out.println("----------------------------------------");
 
-            int option = 0;
-            String choice = "yes";
 
+            while(true) {
 
-            while(option != 7 && choice.equals("yes")) {
                 boolean success = true;
                 System.out.print("Please enter your pin:");
                 int enterPin = scan.nextInt();
-                while(enterPin != user.getPin()){
+                while(enterPin != user.getPIN()){
                     System.out.print("Incorrect, please try again:");
                     enterPin = scan.nextInt();
                 }
                 System.out.println();
                 System.out.println("Pick an option: \n1. Withdraw money\n2. Deposit money\n3. Transfer money between accounts\n4. Get account balances\n5. Get transaction history\n6. Change PIN\n7. Exit");
-                option = scan.nextInt();
+                int option = scan.nextInt();
+
+
                 if(option == 7){break;}
+
                 if(option == 1 || option == 2) {
-                    System.out.println("Which account would you like to use for this (checking or savings? ");
+                    System.out.print("Which account would you like to use for this (checkings or savings)? ");
                     String account = scan.nextLine();
-                    if(option == 1) {
+                    scan.nextLine();
+                    if (option == 1) {
                         System.out.println("Withdrawal Amount: ");
                         double withdraw = scan.nextDouble();
 
-                        if(account.equals("checkings")) {
+                        if (account.equals("checkings")) {
                             if (withdraw <= checkings.getAmount()) {
                                 checkings.setAmount(atm.withdraw(checkings.getAmount(), withdraw));
                             } else {
@@ -59,21 +61,31 @@ public class ATMDisplay {
                                 success = false;
                             }
                         }
+                        System.out.println("Confirmation Receipt: ");
+                        String id = atm.ID(option);
+                        String message = "Withdrawn $" + withdraw + " from " + account + " account " + "(" + id + ")";
+                        atm.updateReceipt(message + "\nSavings Account: $ " + savings.getAmount() + ", Checkings Account: " + checkings.getAmount());
+                        if (success) {
+                            System.out.println(message + "\nThe withdrawal was a success\n");
+                        } else {
+                            System.out.println(message + "\nThe withdrawal was unsuccessful\n");
+                        }
 
                     } else {
                         System.out.println("Deposit Amount: ");
                         double deposit = scan.nextDouble();
-                        if(account.equals("checkings")) {
+                        if (account.equals("checkings")) {
                             checkings.setAmount(atm.deposit(checkings.getAmount(), deposit));
                         } else {
                             savings.setAmount(atm.deposit(savings.getAmount(), deposit));
                         }
                         System.out.println("Confirmation Receipt: ");
                         String id = atm.ID(option);
-                        String message = "Deposited $" + deposit + " into " + account + " account "  + "(" + id + ")";
-                        atm.updateReceipt(message +  "\nSavings Account: $ " + savings.getAmount() + ", Checkings Account: " + checkings.getAmount());
+                        String message = "Deposited $" + deposit + " into " + account + " account " + "(" + id + ")";
+                        atm.updateReceipt(message + "\nSavings Account: $ " + savings.getAmount() + ", Checkings Account: " + checkings.getAmount());
                         System.out.println(message + "\nThe deposit was a success\n");
                     }
+                }
                 if (option == 3) {
                     System.out.println("Which account would you like to transfer money from (checkings or savings)?");
                     String acc = scan.nextLine();
@@ -91,11 +103,28 @@ public class ATMDisplay {
                     System.out.println("Transfer Amount: ");
                     double transfer = scan.nextDouble();
                     if(acc.equals("checkings")) {
-                        checkings.setAmount(atm.transferPtOne(checkings.getAmount(), transfer));
-                        savings.setAmount(atm.transferPtTwo(savings.getAmount(), transfer));
+                        if (transfer <= checkings.getAmount()) {
+                            checkings.setAmount(atm.transferPtOne(checkings.getAmount(), transfer));
+                            savings.setAmount(atm.transferPtTwo(savings.getAmount(), transfer));
+                        } else {
+                            success = false;
+                        }
                     } else {
-                        savings.setAmount(atm.transferPtOne(savings.getAmount(), transfer));
-                        checkings.setAmount(atm.transferPtTwo(checkings.getAmount(), transfer));
+                        if (transfer <= savings.getAmount()) {
+                            savings.setAmount(atm.transferPtOne(savings.getAmount(), transfer));
+                            checkings.setAmount(atm.transferPtTwo(checkings.getAmount(), transfer));
+                        } else {
+                            success = false;
+                        }
+                    }
+                    System.out.println("Confirmation Receipt: ");
+                    String id = atm.ID(option);
+                    String message = "Transferred $" + transfer + " from " + acc + " to " + acc2 + " account "  + "(" + id + ")";
+                    atm.updateReceipt(message +  "\nSavings Account: $ " + savings.getAmount() + ", Checkings Account: " + checkings.getAmount());
+                    if(success) {
+                        System.out.println(message + "\nThe transfer was a success\n");
+                    } else {
+                        System.out.println(message + "\nThe transfer was unsuccessful\n");
                     }
 
                 }
@@ -103,23 +132,45 @@ public class ATMDisplay {
                 if (option == 4){
                     System.out.println("Savings Account: $" + savings.getAmount());
                     System.out.println("Checkings Account: $" + checkings.getAmount());
+                    System.out.println("Confirmation Receipt: ");
+                    String id = atm.ID(option);
+                    String message = "Account balances have been viewed"  + " (" + id + ")";
+                    atm.updateReceipt(message +  "\nSavings Account: $ " + savings.getAmount() + ", Checkings Account: " + checkings.getAmount());
+                    System.out.println(message + "\nThe transaction was a success\n");
                 }
 
                 if(option == 5){
-
+                    System.out.println(atm.getReceipt());
+                    System.out.println("Confirmation Receipt: ");
+                    String id = atm.ID(option);
+                    String message = "Transaction history has been viewed"  + " (" + id + ")";
+                    atm.updateReceipt(message +  "\nSavings Account: $ " + savings.getAmount() + ", Checkings Account: " + checkings.getAmount());
+                    System.out.println(message + "\nThe transaction was a success\n");
                 }
 
                 if(option == 6){
                     System.out.println("Enter New PIN: ");
                     int newPIN = scan.nextInt();
                     user.setPin(newPIN);
+                    System.out.println("Confirmation Receipt: ");
+                    String id = atm.ID(option);
+                    String message = "PIN changed"  + " (" + id + ")";
+                    atm.updateReceipt(message +  "\nSavings Account: $ " + savings.getAmount() + ", Checkings Account: " + checkings.getAmount());
+                    System.out.println(message + "\nThe transaction was a success\n");
                 }
 
                 System.out.print("Would you like to do anything else?");
-                choice = scan.nextLine();
+                String choice = scan.nextLine();
+                scan.nextLine();
+
+                if (choice.equals("no")) {
+
+                    break;
+
+                }
 
             }
             System.out.println("Thank you for being a customer at our ATM!");
         }
     }
-}
+

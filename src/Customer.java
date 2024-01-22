@@ -6,7 +6,8 @@ public class Customer {
         this.pin = pin;
         this.name = name;
     }
-     public void setPin(int newPin){
+    public int getPIN(){return pin;}
+    public void setPin(int newPin){
         pin = newPin;
      }
     //used to set pin

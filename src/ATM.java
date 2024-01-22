@@ -10,6 +10,10 @@ public class ATM {
         numA = 0;
         numS = 0;
     }
+
+    public String getReceipt(){
+        return receipt;
+    }
     public double withdraw(double account, double amount){
         return account -= amount;
     }
